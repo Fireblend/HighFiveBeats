@@ -2,7 +2,10 @@ package org.firekare.beats;
 
 import nme.display.Sprite;
 import nme.events.Event;
+import nme.display.StageAlign;
+import nme.display.StageScaleMode;
 import nme.Lib;
+import nme.events.KeyboardEvent;
 
 /**
  * ...
@@ -14,39 +17,76 @@ class Main extends Sprite
 	public var screenWidth:Float;
 	public var screenHeight:Float;
 	public var background:GameStage;
+	public var gameScreen:Screen;
+	public var currentScreen:Screen;
 	
 	public function new() 
 	{
 		super();
-		addEventListener(Event.ADDED_TO_STAGE, init);
-		//#end
+		
+		//Initialize core variables
+		initialize();
+		
+		//Start the game
+		addEventListener (Event.ENTER_FRAME, this_onEnterFrame);
+		
+		//Start detecting keystrokes
+		Lib.current.stage.addEventListener (KeyboardEvent.KEY_UP, detectKey);
 	}
 
-	private function init(e) 
+	private function initialize() 
 	{
 		//Get stage dimensions
 		screenWidth = Lib.current.stage.stageWidth;
 		screenHeight = Lib.current.stage.stageHeight;
 		
+		//Align stage
+		Lib.current.stage.align = StageAlign.TOP_LEFT;
+		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+		
 		background = new GameStage(this);
 		addChild(background);
 		
-		// entry point
-		
-		// new to Haxe NME? please read *carefully* the readme.txt file!
-		addEventListener (Event.ENTER_FRAME, this_onEnterFrame);
+		//SCREEN_MENU = new MenuScreen(this);
+		gameScreen = new GameScreen(this);
+		//SCREEN_TITLE = new TitleScreen(this);
+		goToScreen(gameScreen);
+	}
+	
+	public function goToScreen(newScreen:Screen) {
+		if(currentScreen!= null){
+			currentScreen.end(false, newScreen);
+		}
+		else {
+			goToScreen2(newScreen);
+		}
+	}
+	
+	public function goToScreen2(newScreen:Screen) {
+		if(currentScreen!= null){
+			var oldSpriteScreen:Sprite = cast(currentScreen, Sprite);
+			removeChild(oldSpriteScreen);
+		}
+		currentScreen = newScreen;
+		var spriteScreen:Sprite = cast(currentScreen, Sprite);
+		spriteScreen = cast(currentScreen, Sprite);
+		addChild(spriteScreen);
+		currentScreen.initialize();
 	}
 	
 	static public function main() 
 	{
-		var stage = Lib.current.stage;
-		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
-		stage.align = nme.display.StageAlign.TOP_LEFT;
-		
 		Lib.current.addChild(new Main());
 	}
 	
 	private function this_onEnterFrame(event:Event):Void {
 		background.update();
+		currentScreen.handleFrame(event);
+	}
+	
+	public function detectKey(event:KeyboardEvent) {
+		if (currentScreen != null) {
+			currentScreen.detectKey(event);
+		}
 	}
 }
