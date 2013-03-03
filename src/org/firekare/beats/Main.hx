@@ -17,7 +17,10 @@ class Main extends Sprite
 	public var screenWidth:Float;
 	public var screenHeight:Float;
 	public var background:GameStage;
+	
 	public var gameScreen:Screen;
+	public var menuScreen:Screen;
+	
 	public var currentScreen:Screen;
 	
 	public function new() 
@@ -47,10 +50,10 @@ class Main extends Sprite
 		background = new GameStage(this);
 		addChild(background);
 		
-		//SCREEN_MENU = new MenuScreen(this);
+		menuScreen = new MenuScreen(this);
 		gameScreen = new GameScreen(this);
 		//SCREEN_TITLE = new TitleScreen(this);
-		goToScreen(gameScreen);
+		goToScreen(menuScreen);
 	}
 	
 	public function goToScreen(newScreen:Screen) {
